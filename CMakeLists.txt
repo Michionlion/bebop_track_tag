@@ -3,6 +3,7 @@ project(bebop_track_tag)
 
 find_package(catkin REQUIRED COMPONENTS
 	geometry_msgs
+	tf
 	roscpp
 	std_msgs
 )
