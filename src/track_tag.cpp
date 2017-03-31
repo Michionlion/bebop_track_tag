@@ -10,7 +10,6 @@
 
 ros::Publisher bebop_velocity;
 ros::Subscriber ar_pose;
-// ros::Duration interval(1.5);
 bool visible;
 
 typedef struct vec{
@@ -22,19 +21,14 @@ typedef struct vec{
 	double x,y,z;
 } vec;
 
-vec offset(0.0,0.0,0.2);
-double move_speed = 5;
+vec offset(0.0,0.0,0.38);
+double move_speed = 0.2;
 geometry_msgs::Twist move;
 
 
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
 	if(msg->markers.empty()) {
-		move.linear.x = 0;
-		move.linear.y = 0;
-		move.linear.z = 0;
-		move.angular.z = 0;
-		bebop_velocity.publish(move); //zero out
 		return;
 	}
 
@@ -42,24 +36,29 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	geometry_msgs::Pose pose = marker.pose.pose;
 
 	double forward = pose.position.z - offset.z;
-	double left = pose.position.x - offset.x;
-	double up = pose.position.y - offset.y;
+	double left = -(pose.position.x - offset.x);
+	double up = -(pose.position.y - offset.y);
 
 	double dis = sqrt(forward*forward+left*left+up*up);
 
-	forward *= move_speed;
-	left *= move_speed;
-	up *= move_speed; // don't scale up, since it is in meters/sec
+	// forward *= move_speed;
+	// left *= move_speed;
+	// up *= move_speed;
+
+	if(dis < 0.04) {
+		forward = left = up = 0;
+	}
 
 	fprintf(stdout, "---\nDIS: %f\nPOS:\nX: %f\nY: %f\nZ: %f\n\n", dis, pose.position.x, pose.position.y, pose.position.z);
 	fprintf(stdout, "MOVE:\nforward: %f\nleft: %f\nup: %f\n---\n", forward, left, up);
 
-	move.linear.x = forward;
-	move.linear.y = left;
-	move.linear.z = up;
-	// move.linear.x = forward > 0.15 ? 1.0 : 0.0;
-	// move.linear.y = left > 0.15 ? 1.0 : 0.0;
-	// move.linear.z = up > 0.15 ? 1.0 : 0.0;
+	// move.linear.x = forward;
+	// move.linear.y = left;
+	// move.linear.z = up;
+	double sp = 0.01;
+	move.linear.x = forward > 0.05 ? sp : 0.0;
+	move.linear.y = left > 0.05 ? sp : 0.0;
+	move.linear.z = up > 0.05 ? sp : 0.0;
 	move.angular.z = 0;
 	bebop_velocity.publish(move);
 
