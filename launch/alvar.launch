@@ -1,5 +1,6 @@
 <launch>
-	<arg name="marker_size" default="6.0" />
+	<arg name="max_frequency" default="30.0" />
+	<arg name="marker_size" default="20.0" />
 	<arg name="max_new_marker_error" default="0.08" />
 	<arg name="max_track_error" default="0.2" />
 	<arg name="cam_image_topic" default="/bebop/image_raw" />
@@ -7,6 +8,7 @@
 	<arg name="output_frame" default="camera_optical" />
 
 	<node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+		<param name="max_frequency"           type="double" value="$(arg max_frequency)" />
 		<param name="marker_size"           type="double" value="$(arg marker_size)" />
 		<param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
 		<param name="max_track_error"       type="double" value="$(arg max_track_error)" />
