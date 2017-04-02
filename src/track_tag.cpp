@@ -81,6 +81,8 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	dead(left, DEADZONE);
 	dead(up, DEADZONE);
 
+	fprintf(stdout, "---\n");
+
 	double lim = 0.1;
 	if(fabs(velocity.linear.x) > lim) {
 		forward = 0;
@@ -95,7 +97,7 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 		fprintf(stdout, "CUT UP\n");
 	}
 
-	fprintf(stdout, "---\nPOS:\nX: %f\nY: %f\nZ: %f\n\n", pose.position.x, pose.position.y, pose.position.z);
+	fprintf(stdout, "\nPOS:\nX: %f\nY: %f\nZ: %f\n\n", pose.position.x, pose.position.y, pose.position.z);
 	fprintf(stdout, "VEL:\nforward: %f\nleft: %f\nup: %f\n\n", velocity.linear.x, velocity.linear.y, velocity.linear.z);
 	fprintf(stdout, "DIS: %f\nOFFSET:\nforward: %f\nleft: %f\nup: %f\n\n", dis, z, x, y);
 	fprintf(stdout, "MOVE:\nforward: %f\nleft: %f\nup: %f\n---\n", forward, left, up);
@@ -105,12 +107,7 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	move.linear.x = forward;
 	move.linear.y = left;
 	move.linear.z = up;
-	// double sp = 0.2;
-	// move.linear.x = forward > 0.05 ? sp : 0.0;
-	// move.linear.y = left > 0.05 ? sp : 0.0;
-	// move.linear.z = up > 0.05 ? sp : 0.0;
 	move.angular.z = 0;
-	ROS_INFO("Publishing");
 	cmd_vel.publish(move);
 
 }
@@ -132,20 +129,12 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "track_tag");
 	ros::NodeHandle nh;
 
-	// ros::Rate r(60);
-
 	cmd_vel = nh.advertise<geometry_msgs::Twist>("bebop/cmd_vel", 1);
 	ar_pose = nh.subscribe("ar_pose_marker", 1, poseCallback);
 	odom = nh.subscribe("bebop/odom", 1, odomCallback);
 
+	//call callbacks
 	ros::spin();
 
-	// while(ros::ok()) {
-	// 	ros::spinOnce();
-	// 	r.sleep();
-	// }
-
-
-	// ros::shutdown();
 	return 0;
 }

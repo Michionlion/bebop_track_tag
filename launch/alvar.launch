@@ -1,5 +1,5 @@
 <launch>
-	<arg name="max_frequency" default="30.0" />
+	<arg name="max_frequency" default="60.0" />
 	<arg name="marker_size" default="20.0" />
 	<arg name="max_new_marker_error" default="0.08" />
 	<arg name="max_track_error" default="0.2" />
