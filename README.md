@@ -6,7 +6,6 @@ To run the track_tag node, the following steps must be completed:
 First, the bebop_driver node must be started, using `roslaunch bebop_driver bebop_node.launch`.
 
 Then, you will need to start the ar_track_alvar package libraries.
-
 We have provided a launch file that does default configuration and should work for any AR tag that is 20cm in size. To launch it, use `roslaunch bebop_track_tag alvar.launch`.
 
 
