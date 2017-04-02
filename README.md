@@ -11,7 +11,7 @@ We have provided a launch file that does default configuration and should work f
 
 Finally, you can launch the track_tag node by using `rosrun bebop_track_tag track_tag`.
 
-This will start tracking, however if the bebop is grounded the velocity commands will not be obeyed, so the bebop must be launched by using either the <a href="https://github.com/Michionlion/bebop_teleop">bebop_teleop</a> package, or by running `rostopic pub --once bebop/takeoff std_msgs/Empty`.
+This will start tracking, however if the bebop is grounded the velocity commands will not be obeyed, so the bebop must be launched by either using the <a href="https://github.com/Michionlion/bebop_teleop">bebop_teleop</a> package, or by running `rostopic pub --once bebop/takeoff std_msgs/Empty`.
 
 The teleop package is highly recommended, as it allows you to set the starting point of the tracking by positioning the drone before starting tracking. However, you will need to disable velocity publishing when using the tracking. To do this, press `0` in the teleop input window.
 
