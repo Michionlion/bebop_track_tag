@@ -10,15 +10,17 @@
 #define MAX_SPEED 0.08
 #define DEADZONE 0.0025
 
+//declare static function stubs
 void clamp(double&, double, double);
 void dead(double&, double);
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr&);
 
+//topics
 ros::Publisher cmd_vel;
 ros::Subscriber ar_pose;
 ros::Subscriber odom;
-bool visible;
 
+//vector3 struct for ease of organization
 typedef struct vec{
 	vec(double X, double Y, double Z) {
 		x = X;
@@ -28,12 +30,18 @@ typedef struct vec{
 	double x,y,z;
 } vec;
 
+//target offset of bebop - x is left/right, y is height, z is backward/forward
 vec offset(0.0,0.0,0.75);
+
+//Twist messages
 geometry_msgs::Twist move;
 geometry_msgs::Twist velocity;
+
+//utility vars for backing up when tracking is lost
 int backCount = 10;
 double lastBack;
 
+//ar_pose_marker callback function
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
 	if(msg->markers.empty()) {
