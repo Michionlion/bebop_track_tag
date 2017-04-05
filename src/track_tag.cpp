@@ -120,29 +120,43 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 
 }
 
+//clamp toClamp between min and max - toClamp is passed by reference so no need to return anything
 void clamp(double& toClamp, double min, double max) {
 	if(toClamp > max) toClamp = max;
 	else if(toClamp < min) toClamp = min;
 }
 
+//create a deadzone for toDead - if it is within deadThresh of 0, clamp it to 0
 void dead(double& toDead, double deadThresh) {
 	if(toDead < deadThresh && toDead > -deadThresh) toDead = 0.0;
 }
 
+//bebop/odom callback function, updates velocity Twist
 void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
 	velocity = msg->twist.twist;
 }
 
+//main method, entrance to ROS node
 int main(int argc, char** argv) {
+	//Initialize ROS, name node track_tag
 	ros::init(argc, argv, "track_tag");
+	//create the NodeHandle
 	ros::NodeHandle nh;
 
+	//start publishing to cmd_vel
 	cmd_vel = nh.advertise<geometry_msgs::Twist>("bebop/cmd_vel", 1);
+
+	//subscribe to ar_pose_marker
 	ar_pose = nh.subscribe("ar_pose_marker", 1, poseCallback);
+	// subscribe to bebop/odom
 	odom = nh.subscribe("bebop/odom", 1, odomCallback);
 
-	//call callbacks
-	ros::spin();
-
+	//call callbacks until ROS shutdown
+	try {
+		ros::spin();
+	} catch(...) {
+		ROS_ERROR("--- ERROR IN spin(), shutting down! ---");
+		ros::shutdown();
+	}
 	return 0;
 }
