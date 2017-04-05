@@ -9,6 +9,7 @@
 
 #define MAX_SPEED 0.08
 #define DEADZONE 0.0025
+#define DEBUG TRUE
 
 //declare static function stubs
 void clamp(double&, double, double);
@@ -41,7 +42,7 @@ geometry_msgs::Twist velocity;
 int backCount = 10;
 double lastBack;
 
-//ar_pose_marker callback function
+//ar_pose_marker callback function - update and publish move message
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
 	if(msg->markers.empty()) {
@@ -94,23 +95,25 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	double lim = 0.1;
 	if(fabs(velocity.linear.x) > lim) {
 		forward = 0;
-		fprintf(stdout, "CUT FORWARD\n");
+		// fprintf(stdout, "CUT FORWARD\n");
 	}
 	if(fabs(velocity.linear.y) > lim) {
 		left = 0;
-		fprintf(stdout, "CUT LEFT\n");
+		// fprintf(stdout, "CUT LEFT\n");
 	}
 	if(fabs(velocity.linear.z) > lim) {
 		up = 0;
-		fprintf(stdout, "CUT UP\n");
+		// fprintf(stdout, "CUT UP\n");
 	}
+
+	#ifdef DEBUG
 
 	fprintf(stdout, "\nPOS:\nX: %f\nY: %f\nZ: %f\n\n", pose.position.x, pose.position.y, pose.position.z);
 	fprintf(stdout, "VEL:\nforward: %f\nleft: %f\nup: %f\n\n", velocity.linear.x, velocity.linear.y, velocity.linear.z);
 	fprintf(stdout, "DIS: %f\nOFFSET:\nforward: %f\nleft: %f\nup: %f\n\n", dis, z, x, y);
 	fprintf(stdout, "MOVE:\nforward: %f\nleft: %f\nup: %f\n---\n", forward, left, up);
 
-
+	#endif
 
 	move.linear.x = forward;
 	move.linear.y = left;
