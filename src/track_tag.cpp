@@ -9,7 +9,7 @@
 
 #define MAX_SPEED 0.08
 #define DEADZONE 0.0025
-#define DEBUG TRUE
+#define DEBUG
 
 //declare static function stubs
 void clamp(double&, double, double);
