@@ -9,7 +9,7 @@
 
 #define MAX_SPEED 0.08
 #define DEADZONE 0.0025
-#define DEBUG
+#define DEBUG 1
 
 //declare static function stubs
 void clamp(double&, double, double);
@@ -32,7 +32,7 @@ typedef struct vec{
 } vec;
 
 //target offset of bebop - x is left/right, y is height, z is backward/forward
-vec offset(0.0,0.0,0.75);
+vec offset(0.0,0.0,1.25);
 
 //Twist messages
 geometry_msgs::Twist move;
@@ -46,8 +46,9 @@ double lastBack;
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
 	if(msg->markers.empty()) {
-		if((ros::Time::now().toSec() - lastBack) > .4 && backCount < 10) {
-			move.linear.x = -0.35;
+		if((ros::Time::now().toSec() - lastBack) > 0.5 && backCount < 6) {
+			// move.linear.x = -0.35;
+			move.linear.x = 0;
 			move.linear.y = 0;
 			move.linear.z = 0;
 			move.angular.z = 0;
@@ -65,12 +66,12 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	ar_track_alvar_msgs::AlvarMarker marker = msg->markers.at(0);
 	geometry_msgs::Pose pose = marker.pose.pose;
 	double x,y,z;
-	double forward = z =pose.position.z - offset.z;
+	double forward = z = pose.position.z - offset.z;
 	double left = x = -(pose.position.x - offset.x);
 	double up = y = -(pose.position.y - offset.y);
 
 	double dis = sqrt(forward*forward+left*left+up*up);
-	double sp = 0.8;
+	double sp = 1;
 
 	if (dis > 5) {
 		ROS_ERROR("Distance too far!");
@@ -85,14 +86,14 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//apply clamp and thresh
 	clamp(forward, -MAX_SPEED, MAX_SPEED);
 	clamp(left, -MAX_SPEED, MAX_SPEED);
-	clamp(up, -MAX_SPEED*3, MAX_SPEED*3);
+	clamp(up, -MAX_SPEED, MAX_SPEED);
 	dead(forward, DEADZONE);
 	dead(left, DEADZONE);
 	dead(up, DEADZONE);
 
 	fprintf(stdout, "---\n");
 
-	double lim = 0.1;
+	double lim = 0.2;
 	if(fabs(velocity.linear.x) > lim) {
 		forward = 0;
 		// fprintf(stdout, "CUT FORWARD\n");
@@ -101,10 +102,10 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 		left = 0;
 		// fprintf(stdout, "CUT LEFT\n");
 	}
-	if(fabs(velocity.linear.z) > lim) {
-		up = 0;
-		// fprintf(stdout, "CUT UP\n");
-	}
+	// if(fabs(velocity.linear.z) > lim) {
+	// 	up = 0;
+	// 	// fprintf(stdout, "CUT UP\n");
+	// }
 
 	#ifdef DEBUG
 
