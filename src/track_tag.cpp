@@ -45,10 +45,16 @@ double lastBack;
 //ar_pose_marker callback function - update and publish move message
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
+<<<<<<< HEAD
 	if(msg->markers.empty()) {
 		if((ros::Time::now().toSec() - lastBack) > 0.5 && backCount < 6) {
 			// move.linear.x = -0.35;
 			move.linear.x = 0;
+=======
+	if(msg->markers.empty()) { // if no tag is in view
+		if((ros::Time::now().toSec() - lastBack) > .4 && backCount < 10) {  // constraint so bebop isn't moving backwards forever
+			move.linear.x = -0.35;  // move backward
+>>>>>>> c8a40e845311846c8f982a2709f308a7e33f5285
 			move.linear.y = 0;
 			move.linear.z = 0;
 			move.angular.z = 0;
@@ -63,7 +69,7 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 
 	backCount = 0;
 
-	ar_track_alvar_msgs::AlvarMarker marker = msg->markers.at(0);
+	ar_track_alvar_msgs::AlvarMarker marker = msg->markers.at(0);  // get the AR tag in view
 	geometry_msgs::Pose pose = marker.pose.pose;
 	double x,y,z;
 	double forward = z = pose.position.z - offset.z;
@@ -73,12 +79,14 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	double dis = sqrt(forward*forward+left*left+up*up);
 	double sp = 1;
 
-	if (dis > 5) {
+	if (dis > 5) {  // if the bebop is much too far from tag
 		ROS_ERROR("Distance too far!");
 		return;
 	}
 
+
 	double p = 1.5;
+	// if differences between current x, y, or z positions and desired positions are greater than 0, set amounts to move forward, scaled by distance from the tag
 	forward = forward > 0 ? sp*pow(fabs(forward), p) : -sp*pow(fabs(forward), p);
 	left = left > 0 ? sp*pow(fabs(left), p) : -sp*pow(fabs(left), p);
 	up = up > 0 ? 1.5*sp*pow(fabs(up), p) : -1.5*sp*pow(fabs(up), p);
@@ -116,6 +124,7 @@ void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 
 	#endif
 
+	// publishing velocity movements to "cmd_vel" to make the bebop move
 	move.linear.x = forward;
 	move.linear.y = left;
 	move.linear.z = up;
