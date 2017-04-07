@@ -45,16 +45,10 @@ double lastBack;
 //ar_pose_marker callback function - update and publish move message
 void poseCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr& msg) {
 	//markers is a vector<AlvarMarker>
-<<<<<<< HEAD
 	if(msg->markers.empty()) {
 		if((ros::Time::now().toSec() - lastBack) > 0.5 && backCount < 6) {
 			// move.linear.x = -0.35;
 			move.linear.x = 0;
-=======
-	if(msg->markers.empty()) { // if no tag is in view
-		if((ros::Time::now().toSec() - lastBack) > .4 && backCount < 10) {  // constraint so bebop isn't moving backwards forever
-			move.linear.x = -0.35;  // move backward
->>>>>>> c8a40e845311846c8f982a2709f308a7e33f5285
 			move.linear.y = 0;
 			move.linear.z = 0;
 			move.angular.z = 0;
